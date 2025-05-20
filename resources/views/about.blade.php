@@ -1,2 +1,0 @@
-<h1> Hi to my course</h1>
-<p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Unde, consectetur voluptatem. Quisquam explicabo, deserunt quis atque odit beatae iusto sit culpa? Nemo officiis cum facilis saepe omnis voluptate quae quo!</p>
