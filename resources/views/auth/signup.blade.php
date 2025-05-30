@@ -1,6 +1,6 @@
 @extends('layouts.clean', ['cssClass' => 'page-signup'])
 
-@section('title', 'Signup')
+@section('title', 'Signup Test Page')
 
 @section('childContent')
  <main>
