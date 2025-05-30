@@ -1,6 +1,6 @@
 @extends('layouts.clean', ['cssClass' => 'page-login'])
 
-@section('title', 'Login')
+@section('title', 'Login Page')
 
 @section('childContent')
 <main>
