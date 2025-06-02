@@ -10,5 +10,4 @@ class SignupController extends Controller
     {
         return view('auth.signup');
     }
-
 }

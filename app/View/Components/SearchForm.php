@@ -13,12 +13,11 @@ class SearchForm extends Component
      */
     public function __construct(
         public string $action = '/search',
-        public string $method = 'GET')
+        public string $method = 'GET'
+    )
     {
-
+        //
     }
-
-
 
     /**
      * Get the view / contents that represent the component.
@@ -28,9 +27,14 @@ class SearchForm extends Component
         return view('components.search-form');
     }
 
-    public function test()
-    {
-        return 'test';
-    }
-
+    /*
+     * Do not use these public properties or methods.
+     * - data
+     * - render
+     * - resolveView
+     * - shouldRender
+     * - view
+     * - withAttributes
+     * - withName
+     */
 }
