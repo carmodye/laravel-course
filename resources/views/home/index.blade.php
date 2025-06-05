@@ -4,6 +4,12 @@
 
 @section('content')
 
+<x-card >
+		<x-slot name="title">Card title 1</x-slot>
+
+    <x-slot name="footer">Card footer 1</x-slot>
+</x-card>
+
 <!-- Home Slider -->
     <section class="hero-slider">
       <!-- Carousel wrapper -->
