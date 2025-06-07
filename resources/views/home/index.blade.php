@@ -1,8 +1,4 @@
-@extends('layouts.app')
-
-@section('title', 'Home Page')
-
-@section('content')
+<x-app-layout title="Home Page">
 @php
     $color = 'yellow';
     $bgColor = 'blue';
@@ -13,7 +9,6 @@
 default slot
     <x-slot name="footer">Card footer 1</x-slot>
 </x-card>
-
 
 <!-- Home Slider -->
     <section class="hero-slider">
@@ -103,8 +98,6 @@ default slot
       </div>
     </section>
     <!--/ Home Slider -->
-
-
     <main>
       <x-search-form action="/search" method="GET" />
       <!-- New Cars -->
@@ -672,12 +665,9 @@ default slot
       </section>
       <!--/ New Cars -->
     </main>
-
 @section('footerLinks')
 @parent
 <a href="#">Link 3</a>
 <a href="#">Link 4</a>
-
 @endsection
-
-@endsection
+</x-app-layout>
