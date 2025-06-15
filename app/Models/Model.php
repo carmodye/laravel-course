@@ -7,4 +7,5 @@ class Model extends EloquentModel
 {
     //
     public $timestamps = false;
+protected $fillable = ['maker_id', 'name'];
 }

@@ -8,4 +8,8 @@ class CarImage extends Model
 {
     //
     public $timestamps = false;
+    protected $fillable = [
+    'image_path',
+    'position',
+];
 }

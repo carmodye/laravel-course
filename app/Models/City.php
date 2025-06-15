@@ -8,4 +8,5 @@ class City extends Model
 {
     //
     public $timestamps = false;
+    protected $fillable = ['state_id', 'name'];
 }
