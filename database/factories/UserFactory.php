@@ -2,7 +2,9 @@
 
 namespace Database\Factories;
 
+use App\Models\Car;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
@@ -42,4 +44,10 @@ class UserFactory extends Factory
             'email_verified_at' => null,
         ]);
     }
+
+    public function favoriteCars(): BelongsToMany
+    { return $this->belongsToMany(Car::class, 'favorite_cars'   );
+    }
+
+
 }
