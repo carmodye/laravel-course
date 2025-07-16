@@ -19,7 +19,8 @@ class CarImageFactory extends Factory
 {
     return [
         'car_id' => 1, // We have to provide for which car we are creating an image during creation process
-        'image_path' => fake()->imageUrl(),
+        //'image_path' => fake()->imageUrl(),
+        'image_path' => 'https://picsum.photos/640/480',
         'position' => function(array $attributes) {
             return Car::find($attributes['car_id'])->images()->count() + 1;
         }

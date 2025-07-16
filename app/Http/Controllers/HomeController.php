@@ -12,16 +12,30 @@ use App\Models\CarImage;
 use App\Models\CarType;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Sequence;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class HomeController extends Controller
 {
     public function index()
     {
-        User::factory()
-    ->has(Car::factory()->count(5), 'favouriteCars')
-    ->create();
+        // Select latest published 30 cars and sort them by published_at date
+        $carsdb = Car::where('published_at', '<', now())
+            ->orderBy('published_at', 'desc')
+            ->limit(30)
+            ->get();
+
+ //       $foundcars = [];
+
+foreach ($carsdb as $car) {
+    $primaryImage = $car->primaryImage;
+    if ($primaryImage && $primaryImage->image_path) {
+        $cars[] = $car;
+    }
+}
 
 
-        return view('home.index');
+        //dd($car->primaryImage()->orderBy('position')->first()->image_path);
+        //dd($cars); // Display the primary image path for the car
+        return view('home.index', ['cars' => $cars]);
     }
 }

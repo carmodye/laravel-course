@@ -57,7 +57,8 @@ class Car extends Model
 
     public function primaryImage(): HasOne
     {
-        return $this->hasOne(CarImage::class)->orderBy('position')->limit(1);
+       return $this->hasOne(CarImage::class)
+            ->oldestOfMany('position');
     }
 
     public function favouredUsers(): BelongsToMany
