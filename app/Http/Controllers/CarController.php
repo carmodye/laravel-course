@@ -67,17 +67,23 @@ class CarController extends Controller
 
     public function search(Request $request)
     {
-        // Get the query builder instance with conditions
-        $query = Car::where('published_at', '<', now())
-            ->orderBy('published_at', 'desc');
+       // Get the query builder instance with conditions
+$query = Car::where('published_at', '<', now())
+    ->orderBy('published_at', 'desc');
 
-        // Get total count of the cars
-        $carCount = $query->count();
-        // Select 30 cars
-        $cars = $query->limit(30)->get();
+// Get total count of the cars
+$carCount = $query->count();
+// Select 30 cars
+$carsdb = $query->limit(30)->get();
 
-        return view('car.search', ['cars' => $cars, 'carCount' => $carCount]);
+foreach ($carsdb as $car) {
+    $primaryImage = $car->primaryImage;
+    if ($primaryImage && $primaryImage->image_path) {
+        $cars[] = $car;
+    }
+}
 
+return view('car.search',  ['cars' => $cars, 'carCount' => $carCount]);
 
     }
 

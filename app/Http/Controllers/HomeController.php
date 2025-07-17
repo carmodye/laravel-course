@@ -24,18 +24,17 @@ class HomeController extends Controller
             ->limit(30)
             ->get();
 
- //       $foundcars = [];
-
-foreach ($carsdb as $car) {
-    $primaryImage = $car->primaryImage;
-    if ($primaryImage && $primaryImage->image_path) {
-        $cars[] = $car;
-    }
-}
-
-
-        //dd($car->primaryImage()->orderBy('position')->first()->image_path);
-        //dd($cars); // Display the primary image path for the car
+        foreach ($carsdb as $car) {
+            $primaryImage = $car->primaryImage;
+            if ($primaryImage && $primaryImage->image_path) {
+                $cars[] = $car;
+            } else {
+                $noprimaryImage[] = $car->id;
+            }
+        }
+        if (!empty($noprimaryImage)) {
+            dd($noprimaryImage);
+        }
         return view('home.index', ['cars' => $cars]);
     }
 }
