@@ -18,9 +18,10 @@ class CarImageFactory extends Factory
     public function definition(): array
 {
     return [
-        'car_id' => 1, // We have to provide for which car we are creating an image during creation process
-        //'image_path' => fake()->imageUrl(),
-        'image_path' => 'https://picsum.photos/640/480',
+        'image_path' => function (array $attributes) {
+            $car = Car::find($attributes['car_id']);
+            return sprintf("https://placehold.co/600x400/gray/white/png?text=%s", $car->maker->name);
+        },
         'position' => function(array $attributes) {
             return Car::find($attributes['car_id'])->images()->count() + 1;
         }
