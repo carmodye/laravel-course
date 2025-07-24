@@ -38,7 +38,8 @@ class CarController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        //save car to database
+        dd($request->all());
     }
 
     /**
