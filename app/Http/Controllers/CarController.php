@@ -93,51 +93,60 @@ class CarController extends Controller
         $priceFrom = $request->integer('price_from');
         $priceTo = $request->integer('price_to');
         $mileage = $request->integer('mileage');
+        $sort = $request->input('sort', '-published_at');
+
 
 
         $query = Car::where('published_at', '<', now())
-            ->with(['primaryImage', 'city', 'carType', 'fuelType', 'maker', 'model'])
-            ->orderBy('published_at', 'desc');
+            ->with(['primaryImage', 'city', 'carType', 'fuelType', 'maker', 'model']);
 
-    if ($maker) {
-        $query->where('maker_id', $maker);
-    }
-    if ($model) {
-        $query->where('model_id', $model);
-    }
+        if ($maker) {
+            $query->where('maker_id', $maker);
+        }
+        if ($model) {
+            $query->where('model_id', $model);
+        }
 
-    if ($state) {
-        $query->join('cities', 'cities.id', '=', 'cars.city_id')
-            ->where('cities.state_id', $state);
-    }
-    if ($city) {
-        $query->where('city_id', $city);
-    }
+        if ($state) {
+            $query->join('cities', 'cities.id', '=', 'cars.city_id')
+                ->where('cities.state_id', $state);
+        }
+        if ($city) {
+            $query->where('city_id', $city);
+        }
 
-    if ($carType) {
-        $query->where('car_type_id', $carType);
-    }
-    if ($fuelType) {
-        $query->where('fuel_type_id', $fuelType);
-    }
-    if ($yearFrom) {
-        $query->where('year', '>=', $yearFrom);
-    }
-    if ($yearTo) {
-        $query->where('year', '<=', $yearTo);
-    }
-    if ($priceFrom) {
-        $query->where('price', '>=', $priceFrom);
-    }
-    if ($priceTo) {
-        $query->where('price', '<=', $priceTo);
-    }
-    if ($mileage) {
-        $query->where('mileage', '<=', $mileage);
-    }
+        if ($carType) {
+            $query->where('car_type_id', $carType);
+        }
+        if ($fuelType) {
+            $query->where('fuel_type_id', $fuelType);
+        }
+        if ($yearFrom) {
+            $query->where('year', '>=', $yearFrom);
+        }
+        if ($yearTo) {
+            $query->where('year', '<=', $yearTo);
+        }
+        if ($priceFrom) {
+            $query->where('price', '>=', $priceFrom);
+        }
+        if ($priceTo) {
+            $query->where('price', '<=', $priceTo);
+        }
+        if ($mileage) {
+            $query->where('mileage', '<=', $mileage);
+        }
+
+        if (str_starts_with($sort, '-')) {
+            $sortBy = substr($sort, 1);
+            $query->orderBy($sortBy, 'desc');
+        } else {
+            $query->orderBy($sort);
+        }
 
 
-        $cars = $query->paginate(15);
+        $cars = $query->paginate(15)
+            ->withQueryString();
 
         return view('car.search', ['cars' => $cars]);
     }
@@ -152,5 +161,4 @@ class CarController extends Controller
 
         return view('car.watchlist', ['cars' => $cars]);
     }
-
 }
