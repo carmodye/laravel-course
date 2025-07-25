@@ -39,7 +39,11 @@ class CarController extends Controller
     public function store(Request $request)
     {
         //save car to database
-        dd($request->all());
+        $data = $request->all();
+        $data['user_id'] = 1;
+        //dd($data);
+        Car::create($data);
+        return redirect()->route('car.index');
     }
 
     /**

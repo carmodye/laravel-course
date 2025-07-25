@@ -44,7 +44,7 @@
                             <div class="col">
                                 <div class="form-group">
                                     <label>Vin Code</label>
-                                    <input placeholder="Vin Code" name="vin_code" />
+                                    <input placeholder="Vin Code" name="vin" />
                                 </div>
                             </div>
                             <div class="col">

@@ -15,6 +15,22 @@ class Car extends Model
     use HasFactory;
 
     protected $guarded = [];
+    protected $fillable = [
+          'maker_id',
+          'model_id',
+          'year',
+          'price',
+          'vin',
+          'mileage',
+          'car_type_id',
+          'fuel_type_id',
+          'user_id',
+          'city_id',
+          'address',
+          'phone',
+          'description',
+          'published_at',
+        ];
 
     public function carType(): BelongsTo
     {
