@@ -34,7 +34,7 @@ class HomeController extends Controller
             }
         }
         if (!empty($noprimaryImage)) {
-            dd($noprimaryImage);
+            //dd($noprimaryImage);
         }
         return view('home.index', ['cars' => $cars]);
     }

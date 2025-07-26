@@ -40,9 +40,14 @@ class CarController extends Controller
     {
         //save car to database
         $data = $request->all();
+        $featuresData = $data['features'] ?? [];
         $data['user_id'] = 1;
         //dd($data);
-        Car::create($data);
+        $car = Car::create($data);
+
+        // Create features
+    $car->features()->create($featuresData);
+
         return redirect()->route('car.index');
     }
 
@@ -51,6 +56,9 @@ class CarController extends Controller
      */
     public function show(Request $request, Car $car)
     {
+        if (!$car->published_at) {
+        abort(404);
+    }
         return view('car.show', ['car' => $car]);
     }
 
