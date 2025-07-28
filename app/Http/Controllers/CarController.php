@@ -8,6 +8,12 @@ use App\Models\User;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Http\Request;
 
+use Illuminate\Support\Facades\Storage;
+
+
+
+// filepath: c:\Users\carmo\Desktop\laravel-course\app\Http\Controllers\CarController.php
+
 class CarController extends Controller
 {
     /**
@@ -41,12 +47,28 @@ class CarController extends Controller
         //save car to database
         $data = $request->all();
         $featuresData = $data['features'] ?? [];
+        $images = $request->file('images') ?? [];
+
+
+
         $data['user_id'] = 1;
-        //dd($data);
         $car = Car::create($data);
 
         // Create features
-    $car->features()->create($featuresData);
+        $car->features()->create($featuresData);
+        // Iterate and create images
+        foreach ($images as $i => $image) {
+            // ...existing code...
+
+            $path = Storage::disk('s3')->put('images', $image);
+
+            $path = Storage::disk('s3')->url($path);
+
+            $car->images()->create(['image_path' => $path, 'position' => $i + 1]);
+            // ...existing code...
+
+
+        }
 
         return redirect()->route('car.index');
     }
@@ -57,8 +79,8 @@ class CarController extends Controller
     public function show(Request $request, Car $car)
     {
         if (!$car->published_at) {
-        abort(404);
-    }
+            abort(404);
+        }
         return view('car.show', ['car' => $car]);
     }
 

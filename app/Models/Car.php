@@ -16,21 +16,21 @@ class Car extends Model
 
     protected $guarded = [];
     protected $fillable = [
-          'maker_id',
-          'model_id',
-          'year',
-          'price',
-          'vin',
-          'mileage',
-          'car_type_id',
-          'fuel_type_id',
-          'user_id',
-          'city_id',
-          'address',
-          'phone',
-          'description',
-          'published_at',
-        ];
+        'maker_id',
+        'model_id',
+        'year',
+        'price',
+        'vin',
+        'mileage',
+        'car_type_id',
+        'fuel_type_id',
+        'user_id',
+        'city_id',
+        'address',
+        'phone',
+        'description',
+        'published_at',
+    ];
 
     public function carType(): BelongsTo
     {
@@ -74,7 +74,7 @@ class Car extends Model
 
     public function primaryImage(): HasOne
     {
-       return $this->hasOne(CarImage::class)
+        return $this->hasOne(CarImage::class)
             ->oldestOfMany('position');
     }
 
@@ -82,8 +82,11 @@ class Car extends Model
     {
         return $this->belongsToMany(User::class, 'favourite_cars');
     }
+
+
+
     public function getCreateDate(): string
-{
-    return (new Carbon($this->created_at))->format('Y-m-d');
-}
+    {
+        return (new Carbon($this->created_at))->format('Y-m-d');
+    }
 }

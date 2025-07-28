@@ -2,8 +2,12 @@
     <main>
         <div class="container-small">
             <h1 class="car-details-page-title">Add new car</h1>
-            <form action="{{ route('car.store') }}" method="POST" enctype="multipart/form-data"
-                class="card add-new-car-form">
+            <form
+                action="{{ route('car.store') }}"
+                method="POST"
+                enctype="multipart/form-data"
+                class="card add-new-car-form"
+            >
                 @csrf
                 <div class="form-content">
                     <div class="form-details">
@@ -19,7 +23,6 @@
                                 <div class="form-group">
                                     <label>Model</label>
                                     <x-select-model />
-                                    <p class="error-message">This field is required</p>
                                 </div>
                             </div>
                             <div class="col">
@@ -32,13 +35,12 @@
                         <div class="form-group">
                             <label>Car Type</label>
                             <x-radio-list-car-type />
-                            <p class="error-message">This field is required</p>
                         </div>
                         <div class="row">
                             <div class="col">
                                 <div class="form-group">
                                     <label>Price</label>
-                                    <input type="number" placeholder="Price" name="price" />
+                                    <input type="number" placeholder="Price" name="price"/>
                                 </div>
                             </div>
                             <div class="col">
@@ -57,21 +59,18 @@
                         <div class="form-group">
                             <label>Fuel Type</label>
                             <x-radio-list-fuel-type />
-                            <p class="error-message">This field is required</p>
                         </div>
                         <div class="row">
                             <div class="col">
                                 <div class="form-group">
                                     <label>State/Region</label>
                                     <x-select-state />
-                                    <p class="error-message">This field is required</p>
                                 </div>
                             </div>
                             <div class="col">
                                 <div class="form-group">
                                     <label>City</label>
                                     <x-select-city />
-                                    <p class="error-message">This field is required</p>
                                 </div>
                             </div>
                         </div>
@@ -95,20 +94,29 @@
                             <textarea rows="10" name="description"></textarea>
                         </div>
                         <div class="form-group">
-                            <label>Published Date</label>
-                            <input type="date" name="published_at" />
+                            <label>Publish Date</label>
+                            <input type="date" name="published_at">
                         </div>
                     </div>
                     <div class="form-images">
                         <div class="form-image-upload">
                             <div class="upload-placeholder">
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                    stroke-width="1.5" stroke="currentColor" style="width: 48px">
-                                    <path stroke-linecap="round" stroke-linejoin="round"
-                                        d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke-width="1.5"
+                                    stroke="currentColor"
+                                    style="width: 48px"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
+                                    />
                                 </svg>
                             </div>
-                            <input id="carFormImageUpload" type="file" multiple />
+                            <input id="carFormImageUpload" type="file" name="images[]" multiple />
                         </div>
                         <div id="imagePreviews" class="car-form-images"></div>
                     </div>
