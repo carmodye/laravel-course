@@ -9,6 +9,8 @@ use Illuminate\Database\Query\Builder;
 use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Validator;
+use Illuminate\Validation\Rules\File;
 
 
 
@@ -41,35 +43,75 @@ class CarController extends Controller
 
     /**
      * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    //  */
+     public function store(Request $request)
     {
-        //save car to database
-        $data = $request->all();
-        $featuresData = $data['features'] ?? [];
-        $images = $request->file('images') ?? [];
+        // Get request data
+        $data = $request->validate([
+            'maker_id' => 'required',
+            'model_id' => 'required',
+            'year' => ['required', 'integer', 'min:1900', 'max:' . date('Y')],
+            'price' => 'required|integer|min:0',
+            'vin' => 'required|string|size:17',
+            'mileage' => 'required|integer|min:0',
+            'car_type_id' => 'required|exists:car_types,id',
+            'fuel_type_id' => 'required|exists:fuel_types,id',
+            'city_id' => 'required|exists:cities,id',
+            'address' => 'required|string',
+            'phone' => 'required|string|min:9',
+            'description' => 'nullable|string',
+            'published_at' => 'nullable|string',
+            'features' => 'array',
+            'features.*' => 'string',
+            'images' => 'array',
+//            'images.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048'
+            'images.*' => File::image()
+                ->max(2048)
+//            ->dimensions(Rule::dimensions()->maxWidth(1000)->maxHeight(1000))
+        ]);
+//
+//        $validator = Validator::make($request->all(), [
+//            'maker_id' => 'required',
+//            'model_id' => 'required',
+//            'year' => ['required', 'integer', 'min:1900', 'max:'.date('Y')],
+//        ], [
+//            'required' => 'Please fill :attribute field',
+//        ], ['maker_id' => 'My Maker', 'model_id' => 'Model']);
+//
+//        if ($validator->fails()) {
+//            //
+//            return redirect(route('car.create'))
+//                ->withErrors($validator)
+//                ->withInput();
+//        }
+//
+//        $data = $validator->validated();
+//
+//        $data = $validator->safe()->only(['maker_id', 'model_id']);
+//        $data = $validator->safe()->except(['year']);
 
+        // Get features data
+        $featuresData = $data['features'];
+        // Get images
+        $images = $request->file('images') ?: [];
 
-
+        // Set user ID
         $data['user_id'] = 1;
+        // Create new car
         $car = Car::create($data);
 
         // Create features
         $car->features()->create($featuresData);
+
         // Iterate and create images
         foreach ($images as $i => $image) {
-            // ...existing code...
-
-            $path = Storage::disk('s3')->put('images', $image);
-
-            $path = Storage::disk('s3')->url($path);
-
+            // Save image on file system
+            $path = $image->store('public/images');
+            // Create record in the database
             $car->images()->create(['image_path' => $path, 'position' => $i + 1]);
-            // ...existing code...
-
-
         }
 
+        // Redirect to car.index route
         return redirect()->route('car.index');
     }
 

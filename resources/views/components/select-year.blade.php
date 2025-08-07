@@ -5,7 +5,8 @@
 
 <select name=year>
     <option value="">Year</option>
-    @foreach ($years as $year)
-        <option value="{{ $year }}">{{ $year }}</option>
-    @endforeach
+      @for ($i = $year; $i >= 1970; $i--)
+        <option value="{{ $i }}"
+                @selected($attributes->get('value') == $i)>{{ $i }}</option>
+    @endfor
 </select>
