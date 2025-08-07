@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreCarRequest;
 use App\Models\Car;
 use App\Models\CarImage;
 use App\Models\User;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Http\Request;
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Validator;
 use Illuminate\Validation\Rules\File;
@@ -44,51 +46,20 @@ class CarController extends Controller
     /**
      * Store a newly created resource in storage.
     //  */
-     public function store(Request $request)
+    public function store(StoreCarRequest $request)
     {
         // Get request data
-        $data = $request->validate([
-            'maker_id' => 'required',
-            'model_id' => 'required',
-            'year' => ['required', 'integer', 'min:1900', 'max:' . date('Y')],
-            'price' => 'required|integer|min:0',
-            'vin' => 'required|string|size:17',
-            'mileage' => 'required|integer|min:0',
-            'car_type_id' => 'required|exists:car_types,id',
-            'fuel_type_id' => 'required|exists:fuel_types,id',
-            'city_id' => 'required|exists:cities,id',
-            'address' => 'required|string',
-            'phone' => 'required|string|min:9',
-            'description' => 'nullable|string',
-            'published_at' => 'nullable|string',
-            'features' => 'array',
-            'features.*' => 'string',
-            'images' => 'array',
-//            'images.*' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048'
-            'images.*' => File::image()
-                ->max(2048)
-//            ->dimensions(Rule::dimensions()->maxWidth(1000)->maxHeight(1000))
-        ]);
-//
-//        $validator = Validator::make($request->all(), [
-//            'maker_id' => 'required',
-//            'model_id' => 'required',
-//            'year' => ['required', 'integer', 'min:1900', 'max:'.date('Y')],
-//        ], [
-//            'required' => 'Please fill :attribute field',
-//        ], ['maker_id' => 'My Maker', 'model_id' => 'Model']);
-//
-//        if ($validator->fails()) {
-//            //
-//            return redirect(route('car.create'))
-//                ->withErrors($validator)
-//                ->withInput();
-//        }
-//
-//        $data = $validator->validated();
-//
-//        $data = $validator->safe()->only(['maker_id', 'model_id']);
-//        $data = $validator->safe()->except(['year']);
+        $data = $request->validated();
+
+        // Get only maker_id and model_id
+        $data2 = $request->safe()->only(['maker_id', 'model_id']);
+
+        // Get everything except published_at
+        $data3 = $request->safe()->except(['published_at']);
+
+        // Merge existing request data with user_id
+        $data4 = $request->safe()->merge(['user_id' => Auth::id()]);
+
 
         // Get features data
         $featuresData = $data['features'];

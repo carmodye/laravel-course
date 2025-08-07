@@ -17,20 +17,17 @@
 <div class="form-group">
     <div class="row">
         <div class="col">
-            @foreach($features as $key => $feature)
+            @foreach ($features as $key => $feature)
                 <label class="checkbox">
-                    <input
-                        type="checkbox"
-                        name="features[{{ $key }}]"
-                        value="1"
-                    />
+                    <input type="checkbox" value="1" name="features[{{ $key }}]"
+                        @checked(array_key_exists($key, $attributes->get('value') ?: [])) />
                     {{ $feature }}
                 </label>
 
                 @if ($loop->iteration % 6 == 0 && !$loop->last)
-                    </div>
-                    <div class="col">
-                @endif
+        </div>
+        <div class="col">
+            @endif
             @endforeach
         </div>
     </div>
