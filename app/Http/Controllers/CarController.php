@@ -23,9 +23,8 @@ class CarController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-
         $cars = User::find(1)
             ->cars()
             ->with(['primaryImage', 'maker', 'model'])
@@ -83,7 +82,8 @@ class CarController extends Controller
         }
 
         // Redirect to car.index route
-        return redirect()->route('car.index');
+        return redirect()->route('car.index')
+            ->with('success', 'Car was created');
     }
 
     /**
@@ -130,6 +130,8 @@ class CarController extends Controller
         $car->update($data);
         $car->features()->update($features);
 
+        $request->session()->flash('success', 'Car updated successfully.');
+
         return redirect()->route('car.index');
 
     }
@@ -159,7 +161,8 @@ class CarController extends Controller
         // Delete images from the database
         $car->images()->whereIn('id', $imagesToDelete->pluck('id'))->delete();
 
-        return redirect()->route('car.index');
+        return redirect()->route('car.index')
+        ->with('success', 'Car was deleted');
     }
 
 
@@ -287,7 +290,8 @@ class CarController extends Controller
         }
 
         // Redirect back to car.images route
-        return redirect()->back();
+        return redirect()->back()
+            ->with('success', 'Car images were updated');
 
 
     }
@@ -309,7 +313,8 @@ class CarController extends Controller
             $position++;
         }
 
-        return redirect()->back();
+        return redirect()->back()
+        ->with('success', 'New images were added');
     }
 
 }

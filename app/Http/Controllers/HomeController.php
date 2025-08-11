@@ -16,8 +16,9 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class HomeController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+
         // Select latest published 30 cars and sort them by published_at date
         $carsdb = Car::where('published_at', '<', now())
         ->with(['primaryImage','city','carType','fuelType','maker','model'])
