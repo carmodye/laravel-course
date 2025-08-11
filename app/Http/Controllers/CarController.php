@@ -102,15 +102,36 @@ class CarController extends Controller
      */
     public function edit(Car $car)
     {
-        return view('car.edit');
+        return view('car.edit', ['car' => $car]);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Car $car)
+    public function update(StoreCarRequest $request, Car $car)
     {
         //
+        $data = $request->validated();
+        $features = array_merge([
+            'abs' => 0,
+            'air_conditioning' => 0,
+            'power_windows' => 0,
+            'power_door_locks' => 0,
+            'cruise_control' => 0,
+            'bluetooth_connectivity' => 0,
+            'remote_start' => 0,
+            'gps_navigation' => 0,
+            'heated_seats' => 0,
+            'climate_control' => 0,
+            'rear_parking_sensors' => 0,
+            'leather_seats' => 0,
+        ], $data['features'] ?? []);
+
+        $car->update($data);
+        $car->features()->update($features);
+
+        return redirect()->route('car.index');
+
     }
 
     /**
@@ -118,7 +139,27 @@ class CarController extends Controller
      */
     public function destroy(Car $car)
     {
-        //
+        // Delete car
+        $car->delete();
+        //dump($car);
+
+        if ($car->features) {
+            $car->features->delete();
+        }
+
+        $imagesToDelete = $car->images()->get();
+
+        // Iterate over images to delete and delete them from file system
+        foreach ($imagesToDelete as $image) {
+            if (Storage::exists($image->image_path)) {
+                Storage::delete($image->image_path);
+            }
+        }
+
+        // Delete images from the database
+        $car->images()->whereIn('id', $imagesToDelete->pluck('id'))->delete();
+
+        return redirect()->route('car.index');
     }
 
 
@@ -209,4 +250,66 @@ class CarController extends Controller
 
         return view('car.watchlist', ['cars' => $cars]);
     }
+    public function carImages(Car $car)
+    {
+        return view('car.images', ['car' => $car]);
+    }
+
+    public function updateImages(Request $request, Car $car)
+    {
+        // Get Validated data of delete images and positions
+        $data = $request->validate([
+            'delete_images' => 'array',
+            'delete_images.*' => 'integer',
+            'positions' => 'array',
+            'positions.*' => 'integer',
+        ]);
+
+        $deleteImages = $data['delete_images'] ?? [];
+        $positions = $data['positions'] ?? [];
+
+        // Select images to delete
+        $imagesToDelete = $car->images()->whereIn('id', $deleteImages)->get();
+
+        // Iterate over images to delete and delete them from file system
+        foreach ($imagesToDelete as $image) {
+            if (Storage::exists($image->image_path)) {
+                Storage::delete($image->image_path);
+            }
+        }
+
+        // Delete images from the database
+        $car->images()->whereIn('id', $deleteImages)->delete();
+
+        // Iterate over positions and update position for each image, by its ID
+        foreach ($positions as $id => $position) {
+            $car->images()->where('id', $id)->update(['position' => $position]);
+        }
+
+        // Redirect back to car.images route
+        return redirect()->back();
+
+
+    }
+
+    public function addImages(Request $request, Car $car)
+    {
+        $images = $request->file('images') ?? [];
+
+        $position = $car->images()->max('position') ?? 0;
+
+        foreach ($images as $image) {
+            // Save it on the file system
+            $path = $image->store('public/images');
+            // Save it in the database
+            $car->images()->create([
+                'image_path' => $path,
+                'position' => $position + 1
+            ]);
+            $position++;
+        }
+
+        return redirect()->back();
+    }
+
 }

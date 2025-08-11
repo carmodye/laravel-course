@@ -2,19 +2,19 @@
 
 namespace App\Models;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use Carbon\Carbon;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Car extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
-    protected $guarded = [];
     protected $fillable = [
         'maker_id',
         'model_id',
@@ -64,12 +64,7 @@ class Car extends Model
 
     public function features(): HasOne
     {
-        return $this->hasOne(CarFeatures::class);
-    }
-
-    public function images(): HasMany
-    {
-        return $this->hasMany(CarImage::class);
+        return $this->hasOne(CarFeatures::class, 'car_id');
     }
 
     public function primaryImage(): HasOne
@@ -78,15 +73,23 @@ class Car extends Model
             ->oldestOfMany('position');
     }
 
+    public function images(): HasMany
+    {
+        return $this->hasMany(CarImage::class)->orderBy('position');
+    }
+
     public function favouredUsers(): BelongsToMany
     {
         return $this->belongsToMany(User::class, 'favourite_cars');
     }
 
-
-
     public function getCreateDate(): string
     {
         return (new Carbon($this->created_at))->format('Y-m-d');
+    }
+
+    public function getTitle()
+    {
+        return $this->year . ' - ' . $this->maker->name . ' ' . $this->model->name;
     }
 }
