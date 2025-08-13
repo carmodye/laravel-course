@@ -4,19 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreCarRequest;
 use App\Models\Car;
-use App\Models\CarImage;
-use App\Models\User;
-use Illuminate\Database\Query\Builder;
 use Illuminate\Http\Request;
-
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Validation\Validator;
-use Illuminate\Validation\Rules\File;
-
-
-
-// filepath: c:\Users\carmo\Desktop\laravel-course\app\Http\Controllers\CarController.php
 
 class CarController extends Controller
 {
@@ -25,7 +15,7 @@ class CarController extends Controller
      */
     public function index(Request $request)
     {
-        $cars = User::find(1)
+        $cars = $request->user()
             ->cars()
             ->with(['primaryImage', 'maker', 'model'])
             ->orderBy('created_at', 'desc')
@@ -44,21 +34,11 @@ class CarController extends Controller
 
     /**
      * Store a newly created resource in storage.
-    //  */
+     */
     public function store(StoreCarRequest $request)
     {
         // Get request data
         $data = $request->validated();
-
-        // Get only maker_id and model_id
-        $data2 = $request->safe()->only(['maker_id', 'model_id']);
-
-        // Get everything except published_at
-        $data3 = $request->safe()->except(['published_at']);
-
-        // Merge existing request data with user_id
-        $data4 = $request->safe()->merge(['user_id' => Auth::id()]);
-
 
         // Get features data
         $featuresData = $data['features'];
@@ -66,7 +46,7 @@ class CarController extends Controller
         $images = $request->file('images') ?: [];
 
         // Set user ID
-        $data['user_id'] = 1;
+        $data['user_id'] = Auth::id();
         // Create new car
         $car = Car::create($data);
 
@@ -102,6 +82,9 @@ class CarController extends Controller
      */
     public function edit(Car $car)
     {
+        if ($car->user_id !== Auth::id()) {
+            abort(403);
+        }
         return view('car.edit', ['car' => $car]);
     }
 
@@ -110,8 +93,13 @@ class CarController extends Controller
      */
     public function update(StoreCarRequest $request, Car $car)
     {
-        //
+        if ($car->user_id !== Auth::id()) {
+            abort(403);
+        }
+        // Get validated data from request
         $data = $request->validated();
+
+        // Get features from the data
         $features = array_merge([
             'abs' => 0,
             'air_conditioning' => 0,
@@ -127,13 +115,17 @@ class CarController extends Controller
             'leather_seats' => 0,
         ], $data['features'] ?? []);
 
+        // Update car details
         $car->update($data);
+
+        // Update Car features
         $car->features()->update($features);
 
-        $request->session()->flash('success', 'Car updated successfully.');
+//        $request->session()->flash('success', 'Car was updated');
 
-        return redirect()->route('car.index');
-
+        // Redirect user back to car listing page
+        return redirect()->route('car.index')
+            ->with('success', 'Car was updated');
     }
 
     /**
@@ -141,39 +133,17 @@ class CarController extends Controller
      */
     public function destroy(Car $car)
     {
-        // Delete car
+        if ($car->user_id !== Auth::id()) {
+            abort(403);
+        }
         $car->delete();
-        //dump($car);
-
-        if ($car->features) {
-            $car->features->delete();
-        }
-
-        $imagesToDelete = $car->images()->get();
-
-        // Iterate over images to delete and delete them from file system
-        foreach ($imagesToDelete as $image) {
-            if (Storage::exists($image->image_path)) {
-                Storage::delete($image->image_path);
-            }
-        }
-
-        // Delete images from the database
-        $car->images()->whereIn('id', $imagesToDelete->pluck('id'))->delete();
 
         return redirect()->route('car.index')
-        ->with('success', 'Car was deleted');
+            ->with('success', 'Car was deleted');
     }
 
-
-    /**
-     * Summary of search
-     * @param mixed $request
-     * @return \Illuminate\Contracts\View\View
-     */
     public function search(Request $request)
     {
-
         $maker = $request->integer('maker_id');
         $model = $request->integer('model_id');
         $carType = $request->integer('car_type_id');
@@ -187,10 +157,9 @@ class CarController extends Controller
         $mileage = $request->integer('mileage');
         $sort = $request->input('sort', '-published_at');
 
-
-
         $query = Car::where('published_at', '<', now())
-            ->with(['primaryImage', 'city', 'carType', 'fuelType', 'maker', 'model']);
+            ->with(['primaryImage', 'city', 'carType', 'fuelType', 'maker', 'model'])
+            ;
 
         if ($maker) {
             $query->where('maker_id', $maker);
@@ -198,7 +167,6 @@ class CarController extends Controller
         if ($model) {
             $query->where('model_id', $model);
         }
-
         if ($state) {
             $query->join('cities', 'cities.id', '=', 'cars.city_id')
                 ->where('cities.state_id', $state);
@@ -206,7 +174,6 @@ class CarController extends Controller
         if ($city) {
             $query->where('city_id', $city);
         }
-
         if ($carType) {
             $query->where('car_type_id', $carType);
         }
@@ -230,12 +197,11 @@ class CarController extends Controller
         }
 
         if (str_starts_with($sort, '-')) {
-            $sortBy = substr($sort, 1);
-            $query->orderBy($sortBy, 'desc');
+            $sort = substr($sort, 1);
+            $query->orderBy($sort, 'desc');
         } else {
             $query->orderBy($sort);
         }
-
 
         $cars = $query->paginate(15)
             ->withQueryString();
@@ -243,16 +209,26 @@ class CarController extends Controller
         return view('car.search', ['cars' => $cars]);
     }
 
-
     public function watchlist()
     {
-        $cars = User::find(4)
+       if (Auth::check()) {
+    // User is authenticated
+     $cars = Auth::user()
             ->favouriteCars()
             ->with(['primaryImage', 'city', 'carType', 'fuelType', 'maker', 'model'])
             ->paginate(15);
 
-        return view('car.watchlist', ['cars' => $cars]);
+        return view('car.watchlist', ['cars' => $cars]); // Get the authenticated user
+} else {
+
+    // User is not authenticated
+    abort(403);
+}
+
+
+
     }
+
     public function carImages(Car $car)
     {
         return view('car.images', ['car' => $car]);
@@ -260,6 +236,9 @@ class CarController extends Controller
 
     public function updateImages(Request $request, Car $car)
     {
+        if ($car->user_id !== Auth::id()) {
+            abort(403);
+        }
         // Get Validated data of delete images and positions
         $data = $request->validate([
             'delete_images' => 'array',
@@ -292,16 +271,18 @@ class CarController extends Controller
         // Redirect back to car.images route
         return redirect()->back()
             ->with('success', 'Car images were updated');
-
-
     }
 
     public function addImages(Request $request, Car $car)
     {
+        if ($car->user_id !== Auth::id()) {
+            abort(403);
+        }
+        // Get images from request
         $images = $request->file('images') ?? [];
 
+        // Select max position of car images
         $position = $car->images()->max('position') ?? 0;
-
         foreach ($images as $image) {
             // Save it on the file system
             $path = $image->store('public/images');
@@ -314,7 +295,6 @@ class CarController extends Controller
         }
 
         return redirect()->back()
-        ->with('success', 'New images were added');
+            ->with('success', 'New images were added');
     }
-
 }

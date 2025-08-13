@@ -1,25 +1,17 @@
 <?php
 
+use App\Http\Controllers\CarController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LoginController;
+use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\SignupController;
-use App\Http\Controllers\CarController;
 use Illuminate\Support\Facades\Route;
 
+Route::get('/', [HomeController::class, 'index'])->name('home');
 
-Route::get('/', action: [HomeController::class, 'index'])->name(name: 'home');
-
-
-
-
-Route::get('/signup', action: [SignupController::class, 'create'])->name(name: 'signup');
-
-Route::get('/login', action: [LoginController::class, 'create'])->name(name: 'login');
-
-
-Route::get('/car/search', action: [CarController::class, 'search'])->name(name: 'car.search');
-Route::get('/car/watchlist', action: [CarController::class, 'watchlist'])->name(name: 'car.watchlist');
-Route::resource(name: 'car', controller: CarController::class);
+Route::get('/car/search', [CarController::class, 'search'])->name('car.search');
+Route::get('/car/watchlist', [CarController::class, 'watchlist'])->name('car.watchlist');
+Route::resource('car', CarController::class);
 Route::get('/car/{car}/images', [CarController::class, 'carImages'])
         ->name('car.images');
 Route::put('/car/{car}/images', [CarController::class, 'updateImages'])
@@ -27,4 +19,17 @@ Route::put('/car/{car}/images', [CarController::class, 'updateImages'])
 Route::post('/car/{car}/images', [CarController::class, 'addImages'])
         ->name('car.addImages');
 
+Route::get('/signup', [SignupController::class, 'create'])->name('signup');
+Route::post('/signup', [SignupController::class, 'store'])->name('signup.store');
+Route::get('/login', [LoginController::class, 'create'])->name('login');
+Route::post('/login', [LoginController::class, 'store'])->name('login.store');
+Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
+Route::get('/forgot-password', [PasswordResetController::class, 'showForgotPassword'])
+    ->name('password.request');
+Route::post('/forgot-password', [PasswordResetController::class, 'forgotPassword'])
+    ->name('password.email');
+Route::get('/reset-password/{token}', [PasswordResetController::class, 'showResetPassword'])
+    ->name('password.reset');
+Route::post('/reset-password', [PasswordResetController::class, 'resetPassword'])
+    ->name('password.update');
