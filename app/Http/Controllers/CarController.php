@@ -8,9 +8,11 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 
+/**
+ * Summary of CarController
+ */
 class CarController extends Controller
-{
-    /**
+{    /**
      * Display a listing of the resource.
      */
     public function index(Request $request)
@@ -296,5 +298,10 @@ class CarController extends Controller
 
         return redirect()->back()
             ->with('success', 'New images were added');
+    }
+
+    /**
+     */
+    public function __construct() {
     }
 }
