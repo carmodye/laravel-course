@@ -65,5 +65,10 @@ public function favouriteCars(): BelongsToMany
         return $this->hasMany(Car::class);
     }
 
+public function isOauthUser(): bool
+{
+    return !$this->password;
+}
+
 
 }

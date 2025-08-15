@@ -5,6 +5,7 @@ use App\Http\Controllers\EmailVerifyController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\PasswordResetController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\SignupController;
 use App\Http\Controllers\SocialiteController;
 use App\Http\Middleware\EnsureTodayIsWeekend;
@@ -36,6 +37,11 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/car/{car}/images', [CarController::class, 'addImages'])
             ->name('car.addImages');
     });
+    Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::put('/profile/password', [ProfileController::class, 'updatePassword'])
+        ->name('profile.updatePassword');
+
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 });
 
