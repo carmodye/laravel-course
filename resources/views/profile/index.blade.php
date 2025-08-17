@@ -41,6 +41,7 @@
                     </div>
                 </div>
             </form>
+@if (!$user->isOauthUser())
 
             <form action="{{ route('profile.updatePassword') }}" method="POST"
                   class="card p-large my-large">
@@ -72,6 +73,7 @@
                     </div>
                 </div>
             </form>
+            @endif
         </div>
     </main>
 </x-app-layout>

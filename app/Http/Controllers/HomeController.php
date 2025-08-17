@@ -21,7 +21,7 @@ class HomeController extends Controller
 
         // Select latest published 30 cars and sort them by published_at date
         $carsdb = Car::where('published_at', '<', now())
-        ->with(['primaryImage','city','carType','fuelType','maker','model'])
+        ->with(['primaryImage','city','carType','fuelType','maker','model','favouredUsers'])
             ->orderBy('published_at', 'desc')
             ->limit(30)
             ->get();

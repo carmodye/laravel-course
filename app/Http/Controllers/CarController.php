@@ -123,7 +123,7 @@ class CarController extends Controller
         // Update Car features
         $car->features()->update($features);
 
-//        $request->session()->flash('success', 'Car was updated');
+        //        $request->session()->flash('success', 'Car was updated');
 
         // Redirect user back to car listing page
         return redirect()->route('car.index')
@@ -160,8 +160,8 @@ class CarController extends Controller
         $sort = $request->input('sort', '-published_at');
 
         $query = Car::where('published_at', '<', now())
-            ->with(['primaryImage', 'city', 'carType', 'fuelType', 'maker', 'model'])
-            ;
+            ->with(['primaryImage', 'city', 'carType', 'fuelType', 'maker', 'model','favouredUsers'])
+        ;
 
         if ($maker) {
             $query->where('maker_id', $maker);
@@ -211,25 +211,7 @@ class CarController extends Controller
         return view('car.search', ['cars' => $cars]);
     }
 
-    public function watchlist()
-    {
-       if (Auth::check()) {
-    // User is authenticated
-     $cars = Auth::user()
-            ->favouriteCars()
-            ->with(['primaryImage', 'city', 'carType', 'fuelType', 'maker', 'model'])
-            ->paginate(15);
 
-        return view('car.watchlist', ['cars' => $cars]); // Get the authenticated user
-} else {
-
-    // User is not authenticated
-    abort(403);
-}
-
-
-
-    }
 
     public function carImages(Car $car)
     {
@@ -302,6 +284,7 @@ class CarController extends Controller
 
     /**
      */
-    public function __construct() {
+    public function __construct()
+    {
     }
 }
