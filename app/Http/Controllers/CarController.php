@@ -6,6 +6,7 @@ use App\Http\Requests\StoreCarRequest;
 use App\Models\Car;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 
 /**
@@ -31,6 +32,7 @@ class CarController extends Controller
      */
     public function create()
     {
+        Gate::authorize('create',Car::class);
         return view('car.create');
     }
 
@@ -39,6 +41,9 @@ class CarController extends Controller
      */
     public function store(StoreCarRequest $request)
     {
+
+        Gate::authorize('create',Car::class);
+
         // Get request data
         $data = $request->validated();
 
@@ -84,9 +89,7 @@ class CarController extends Controller
      */
     public function edit(Car $car)
     {
-        if ($car->user_id !== Auth::id()) {
-            abort(403);
-        }
+        Gate::authorize('update', $car);
         return view('car.edit', ['car' => $car]);
     }
 
@@ -95,9 +98,10 @@ class CarController extends Controller
      */
     public function update(StoreCarRequest $request, Car $car)
     {
-        if ($car->user_id !== Auth::id()) {
-            abort(403);
-        }
+
+
+        Gate::authorize('update', $car);
+
         // Get validated data from request
         $data = $request->validated();
 
@@ -135,9 +139,7 @@ class CarController extends Controller
      */
     public function destroy(Car $car)
     {
-        if ($car->user_id !== Auth::id()) {
-            abort(403);
-        }
+        Gate::authorize('delete', $car);
         $car->delete();
 
         return redirect()->route('car.index')
@@ -160,7 +162,7 @@ class CarController extends Controller
         $sort = $request->input('sort', '-published_at');
 
         $query = Car::where('published_at', '<', now())
-            ->with(['primaryImage', 'city', 'carType', 'fuelType', 'maker', 'model','favouredUsers'])
+            ->with(['primaryImage', 'city', 'carType', 'fuelType', 'maker', 'model', 'favouredUsers'])
         ;
 
         if ($maker) {
@@ -215,14 +217,15 @@ class CarController extends Controller
 
     public function carImages(Car $car)
     {
+        Gate::authorize('update', $car);
+
         return view('car.images', ['car' => $car]);
     }
 
     public function updateImages(Request $request, Car $car)
     {
-        if ($car->user_id !== Auth::id()) {
-            abort(403);
-        }
+        Gate::authorize('update', $car);
+
         // Get Validated data of delete images and positions
         $data = $request->validate([
             'delete_images' => 'array',
@@ -259,9 +262,7 @@ class CarController extends Controller
 
     public function addImages(Request $request, Car $car)
     {
-        if ($car->user_id !== Auth::id()) {
-            abort(403);
-        }
+        Gate::authorize('update', $car);
         // Get images from request
         $images = $request->file('images') ?? [];
 
