@@ -38,6 +38,7 @@ Route::middleware(['auth'])->group(function () {
 });
 
 Route::get('/car/{car}', [CarController::class, 'show'])->name('car.show');
+Route::post('/car/phone/{car}', [CarController::class, 'showPhone'])->name('car.showPhone');
 
 // ou can find the official docs here https://laravel.com/docs/11.x/verification#the-email-verification-handler
 

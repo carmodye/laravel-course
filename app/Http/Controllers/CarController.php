@@ -30,11 +30,14 @@ class CarController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
-    {
-        Gate::authorize('create',Car::class);
-        return view('car.create');
+   public function create()
+{
+    if (!Gate::allows('create', Car::class)) {
+        return redirect()->route('profile.index')
+            ->with('warning', 'Please provide phone number');
     }
+    return view('car.create');
+}
 
     /**
      * Store a newly created resource in storage.
@@ -42,8 +45,10 @@ class CarController extends Controller
     public function store(StoreCarRequest $request)
     {
 
-        Gate::authorize('create',Car::class);
-
+        if (!Gate::allows('create', Car::class)) {
+        return redirect()->route('profile.index')
+            ->with('warning', 'Please provide phone number');
+    }
         // Get request data
         $data = $request->validated();
 
@@ -282,6 +287,11 @@ class CarController extends Controller
         return redirect()->back()
             ->with('success', 'New images were added');
     }
+
+    public function showPhone(Car $car)
+{
+    return response()->json(['phone' => $car->phone]);
+}
 
     /**
      */

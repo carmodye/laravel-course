@@ -20,23 +20,24 @@ class HomeController extends Controller
     {
 
         // Select latest published 30 cars and sort them by published_at date
-        $carsdb = Car::where('published_at', '<', now())
+        $cars = Car::where('published_at', '<', now())
         ->with(['primaryImage','city','carType','fuelType','maker','model','favouredUsers'])
             ->orderBy('published_at', 'desc')
             ->limit(30)
             ->get();
 
-        foreach ($carsdb as $car) {
-            $primaryImage = $car->primaryImage;
-            if ($primaryImage && $primaryImage->image_path) {
-                $cars[] = $car;
-            } else {
-                $noprimaryImage[] = $car->id;
-            }
-        }
-        if (!empty($noprimaryImage)) {
-            //dd($noprimaryImage);
-        }
+        // foreach ($carsdb as $car) {
+        //     $primaryImage = $car->primaryImage;
+        //     if ($primaryImage && $primaryImage->image_path) {
+        //         $cars[] = $car;
+        //     } else {
+        //         $noprimaryImage[] = $car->id;
+        //     }
+        // }
+        // if (!empty($noprimaryImage)) {
+        //     //dd($noprimaryImage);
+        // }
+
         return view('home.index', ['cars' => $cars]);
     }
 }
