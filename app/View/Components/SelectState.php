@@ -2,21 +2,25 @@
 
 namespace App\View\Components;
 
+use App\Models\State;
 use Closure;
 use Illuminate\Contracts\View\View;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\View\Component;
-use App\Models\State;
 
 class SelectState extends Component
 {
     public Collection $states;
+
     /**
      * Create a new component instance.
      */
     public function __construct()
     {
-        $this->states = State::orderBy('name')->get();
+        $this->states = Cache::rememberForever('states', function() {
+            return State::orderBy('name')->get();
+        });
     }
 
     /**

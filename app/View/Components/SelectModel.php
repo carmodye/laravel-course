@@ -5,6 +5,7 @@ namespace App\View\Components;
 use Closure;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\View\Component;
 use App\Models\Model;
 
@@ -16,7 +17,9 @@ class SelectModel extends Component
      */
     public function __construct()
     {
-        $this->models = Model::orderBy('name')->get();
+        $this->models = Cache::rememberForever('models', function () {
+            return Model::orderBy('name')->get();
+        });
     }
 
     /**

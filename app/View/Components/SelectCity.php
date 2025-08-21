@@ -7,6 +7,7 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\View\Component;
 use App\Models\City;
+use Illuminate\Support\Facades\Cache;
 
 class SelectCity extends Component
 {
@@ -16,8 +17,9 @@ class SelectCity extends Component
      */
     public function __construct()
     {
-        $this->cities = City::orderBy('name')->get();
-        //
+        $this->cities = Cache::rememberForever('cities', function () {
+            return City::orderBy('name')->get();
+        });
     }
 
     /**
